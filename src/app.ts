@@ -1,3 +1,39 @@
+// Project State Management
+class ProjectState {
+  private listeners: any[] = [];
+  // 싱글톤 패턴 적용
+  private projects: any[] = [];
+  private static instance: ProjectState;
+
+  private constructor() {}
+
+  static getInstance() {
+    if (this.instance) {
+      return this.instance;
+    }
+    this.instance = new ProjectState();
+    return this.instance;
+  }
+
+  addListener(listenerFn: Function) {
+    this.listeners.push(listenerFn);
+  }
+
+  addProject(title: string, description: string, numOfPeople: number) {
+    const newProject = {
+      id: Math.random().toString(),
+      title: title,
+      description: description,
+      people: numOfPeople,
+    };
+    this.projects.push(newProject);
+    for (const listenerFn of this.listeners) {
+      listenerFn(this.projects.slice());
+    }
+  }
+}
+
+const projectState = ProjectState.getInstance();
 
 // Validation
 interface Validatable {
@@ -37,6 +73,7 @@ function validate(validatableInput: Validatable) {
 
   return isValid;
 }
+
 // autobind decorator
 function autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
   const originalMethod = descriptor.value;
@@ -168,6 +205,7 @@ class ProjectInput {
     // ts에서는 튜플이지만, js에서는 그냥 배열일 뿐. 배열인지 검사
     if (Array.isArray(userInput)) {
       const [title, desc, people] = userInput;
+      projectState.addProject(title, desc, people);
       this.clearInputs();
       console.log(title, desc, people);
     }
