@@ -37,6 +37,7 @@ class ProjectInput {
     this.attach();
   }
 
+  // private: only call it from inside the class
   private gatherUserInput(): [string, string, number] | void {
     const enteredTitle = this.titleInputElement.value;
     const enteredDescription = this.descriptionInputElement.value;
@@ -49,9 +50,9 @@ class ProjectInput {
       enteredpeople.trim().length === 0
     ) {
       alert('유효하지 않는 입력값입니다. 다시 시도해주세용.');
-      return;
+      return; // void
     } else {
-      return [enteredTitle, enteredDescription, parseInt(enteredpeople)];
+      return [enteredTitle, enteredDescription, parseInt(enteredpeople)]; // tuple
     }
   }
 
