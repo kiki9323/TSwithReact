@@ -1,3 +1,42 @@
+
+// Validation
+interface Validatable {
+  value: string | number;
+  required?: boolean;
+  minLength?: number;
+  maxLength?: number;
+  min?: number;
+  max?: number;
+}
+
+// 검증 가능한 객체를 받는다.
+function validate(validatableInput: Validatable) {
+  let isValid = true;
+
+  // value가 비어있는지 확인
+  if (validatableInput.required) {
+    isValid = isValid && validatableInput.value.toString().trim().length !== 0;
+  }
+
+  // != null 의 경우, 0일 경우에도 검사를 확실히 해줄 수 있다. null, undefined 걸러 줌.
+  if (validatableInput.minLength != null && typeof validatableInput.value === 'string') {
+    isValid = isValid && validatableInput.value.length >= validatableInput.minLength;
+  }
+
+  if (validatableInput.maxLength != null && typeof validatableInput.value === 'string') {
+    isValid = isValid && validatableInput.value.length <= validatableInput.maxLength;
+  }
+
+  if (validatableInput.min != null && typeof validatableInput.value === 'number') {
+    isValid = isValid && validatableInput.value >= validatableInput.min;
+  }
+
+  if (validatableInput.max != null && typeof validatableInput.value === 'number') {
+    isValid = isValid && validatableInput.value <= validatableInput.max;
+  }
+
+  return isValid;
+}
 // autobind decorator
 function autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
   const originalMethod = descriptor.value;
@@ -43,12 +82,26 @@ class ProjectInput {
     const enteredDescription = this.descriptionInputElement.value;
     const enteredpeople = this.peopleInputElement.value;
 
+    const titleValidatable: Validatable = {
+      value: enteredTitle,
+      required: true,
+    };
+
+    const descriptionValidatable: Validatable = {
+      value: enteredDescription,
+      required: true,
+      minLength: 5,
+    };
+
+    const peopleValidatable: Validatable = {
+      value: +enteredpeople,
+      required: true,
+      min: 1,
+      max: 5,
+    };
+
     // 입력값이 비어있는지 검사
-    if (
-      enteredTitle.trim().length === 0 ||
-      enteredDescription.trim().length === 0 ||
-      enteredpeople.trim().length === 0
-    ) {
+    if (!validate(titleValidatable) || !validate(descriptionValidatable) || !validate(peopleValidatable)) {
       alert('유효하지 않는 입력값입니다. 다시 시도해주세용.');
       return; // void
     } else {
